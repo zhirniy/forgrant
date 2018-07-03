@@ -1,16 +1,13 @@
 <?php
-//var_dump($_POST);
-/*session_start();
-if (!isset($_SESSION['product_id'])) {
-  $_SESSION['product_id'] = $_POST['product_id'];
-  $product_id = $_SESSION['product_id'];
-}*/
-//else{	
-$product_id = $_POST['product_id'];
-//}
+session_start();
+if (isset($_POST['product_id'])) {
+	$_SESSION['product_id'] = $_POST['product_id'];
+}
+
+$product_id = $_SESSION['product_id'];
+$price_period = 0;
 
 
-echo $product_id;
 $dbh = new PDO('mysql:host=localhost;dbname=forgrant', 'root', '21072013');
 class DatePrice{
 	public $id;
@@ -35,6 +32,8 @@ if (isset($_POST['id'])){
 	$price_new = $_POST['price_new'];
 	$sth = $dbh->prepare("INSERT INTO dateprice (date_on, date_off, price) VALUES ('".$date_on_new."', '".$date_off_new."', '".$price_new."')");
 	$sth->execute();
+}else if(isset($_POST['submit_price'])){
+	$price_period = 5;
 }
 
 $sth = $dbh->prepare("SELECT * FROM dateprice WHERE id_product=".$product_id);
@@ -80,8 +79,13 @@ foreach ($result as $product) { ?>
 <h4>Цена на период:</h4>
 <form method="post" action="product.php">
 		<input type="date" name="date_on_period" required value="">
-		<input type="number" name="price_period" required value="0">
-		<input type="submit" name ="submit_period" value="Определить" >
+		<input type="date" name="date_off_period" required value="">
+		<select name="sort">
+			<option value="min_period">Период действия</option>
+			<option value="min_date">Установленная позднее</option>
+		</select>
+		<input type="number" name="price_period" required value="<?php echo $price_period; ?>">
+		<input type="submit" name ="submit_price" value="Определить" >
 </form>
 <br>
 <br>
