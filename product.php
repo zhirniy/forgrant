@@ -33,7 +33,16 @@ if (isset($_POST['id'])){
 	$sth = $dbh->prepare("INSERT INTO dateprice (date_on, date_off, price) VALUES ('".$date_on_new."', '".$date_off_new."', '".$price_new."')");
 	$sth->execute();
 }else if(isset($_POST['submit_price'])){
-	$price_period = 5;
+	//$price_period = 5;
+	//$sth = $dbh->prepare("SELECT DATEDIFF(dd, date_on, date_off) dateprice WHERE id_product=".$product_id);
+	$sth = $dbh->prepare('SELECT timestampdiff(DAY,"2009-08-29 13:19","2009-09-30 13:18")');
+	$sth->execute();
+	$result2 = $sth->fetchAll();
+	var_dump($result2[0][0]);
+	//$fff = date_diff('2010-01-01', '2010-02-20');
+	//echo $fff;
+
+	
 }
 
 $sth = $dbh->prepare("SELECT * FROM dateprice WHERE id_product=".$product_id);
