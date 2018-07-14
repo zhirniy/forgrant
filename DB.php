@@ -8,5 +8,6 @@ $sth = $dbh->prepare("SELECT id, descriptions FROM product");
 $sth->execute();
 
 $result = $sth->fetchAll(PDO::FETCH_CLASS, "Product");
+//var_dump($result);
 
 ?>

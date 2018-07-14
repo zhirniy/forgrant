@@ -27,21 +27,30 @@ if (isset($_POST['id'])){
 	$sth = $dbh->prepare("DELETE FROM dateprice WHERE id=".$del_id);
 	$sth->execute();
 }else if(isset($_POST['submit_new'])){
+	var_dump($_POST);
 	$date_on_new = $_POST['date_on_new'];
 	$date_off_new = $_POST['date_off_new'];
 	$price_new = $_POST['price_new'];
-	$sth = $dbh->prepare("INSERT INTO dateprice (date_on, date_off, price) VALUES ('".$date_on_new."', '".$date_off_new."', '".$price_new."')");
+	$sth = $dbh->prepare("INSERT INTO dateprice (id_product, date_on, date_off, price) VALUES ('".$product_id."','".$date_on_new."', '".$date_off_new."', '".$price_new."')");
 	$sth->execute();
 }else if(isset($_POST['submit_price'])){
-	//$price_period = 5;
-	//$sth = $dbh->prepare("SELECT DATEDIFF(dd, date_on, date_off) dateprice WHERE id_product=".$product_id);
-	$sth = $dbh->prepare('SELECT timestampdiff(DAY,"2009-08-29 13:19","2009-09-30 13:18")');
+	if($_POST['sort'] === 'min_date'){
+	$date_on_period = $_POST['date_on_period'];
+	$date_off_period = $_POST['date_off_period'];
+	$sth = $dbh->prepare("SELECT * FROM dateprice WHERE id_product=".$product_id.' AND date_on <= "'.$_POST['date_on_period'].'" AND date_off >= "'.$_POST['date_off_period'].'" ORDER BY date_on DESC LIMIT 1');
 	$sth->execute();
-	$result2 = $sth->fetchAll();
-	var_dump($result2[0][0]);
-	//$fff = date_diff('2010-01-01', '2010-02-20');
-	//echo $fff;
+	$result = $sth->fetchAll();
+	$price_period = $result[0][4];
 
+	}else if($_POST['sort'] === 'min_period') {
+	$price_period = "7777";
+	$date_on_period = $_POST['date_on_period'];
+	$date_off_period = $_POST['date_off_period'];
+	$sth = $dbh->prepare("SELECT * FROM dateprice WHERE id_product=".$product_id.' AND date_on <= "'.$_POST['date_on_period'].'" AND date_off >= "'.$_POST['date_off_period'].'" ORDER BY date_off - date_on LIMIT 1');
+	$sth->execute();
+	$result = $sth->fetchAll();
+	$price_period = $result[0][4];
+	}
 	
 }
 
@@ -87,8 +96,8 @@ foreach ($result as $product) { ?>
 <br>
 <h4>Цена на период:</h4>
 <form method="post" action="product.php">
-		<input type="date" name="date_on_period" required value="">
-		<input type="date" name="date_off_period" required value="">
+		<input type="date" name="date_on_period" required value="<?php echo $date_on_period; ?>">
+		<input type="date" name="date_off_period" required value="<?php echo $date_off_period; ?>"">
 		<select name="sort">
 			<option value="min_period">Период действия</option>
 			<option value="min_date">Установленная позднее</option>
